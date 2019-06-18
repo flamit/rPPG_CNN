@@ -16,7 +16,7 @@ parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs 
 parser.add_argument("--n_threads", default=4, type=int, help="Number of workers for data pipeline")
 parser.add_argument("--train", default=True, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--epochs", default=1, type=int, help="Number of complete passes over data to train for")
-parser.add_argument("--lr", default=1e-4, type=float, help="Learning rate for the optimizer")
+parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
 parser.add_argument("--save_iter", default=5, type=int, help="Save a model ckpt after these iterations")
 

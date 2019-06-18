@@ -1,6 +1,8 @@
 from torch.utils.data import Dataset
 from skimage.measure import block_reduce
 import numpy as np
+import pandas as pd
+import csv
 import cv2
 import os
 
@@ -11,6 +13,7 @@ import os
 # load gt
 
 # Input will be dir names
+
 
 class FaceFrameReaderTrain(Dataset):
 
@@ -27,10 +30,14 @@ class FaceFrameReaderTrain(Dataset):
 
     def read_gt_file(self, idx):
         gt_file = self.dir_paths[idx] + '.txt'
-        with open(gt_file) as file:
-            data = file.read()
-        data = [float(x) for x in data.split() if float(x) > 60]
+        with open(gt_file, 'r') as input_file:
+            for row_idx, row in enumerate(csv.reader(input_file, delimiter=',')):
+                if len(row) > 0:
+                    if "B: BVP" in str(row):
+                        header_row = row_idx
 
+        data = pd.read_csv(gt_file, skiprows=header_row + 2, header=None, delimiter=',')
+        data = np.asarray(data[1].values.data)
         return data
 
     def __len__(self):
@@ -39,6 +46,7 @@ class FaceFrameReaderTrain(Dataset):
     def __getitem__(self, idx):
         frames = []
         idx = np.random.randint(0, len(self.dir_paths))
+        gt = self.read_gt_file(idx)
         start_frame_idx = np.random.randint(0, len(self.image_names[idx]) - self.T)
         for i in range(start_frame_idx, start_frame_idx + self.T):
             path = os.path.join(self.dir_paths[idx], self.image_names[idx][i])
@@ -50,7 +58,8 @@ class FaceFrameReaderTrain(Dataset):
             frames.append(image)
         images_stacked = np.concatenate(frames)
         images_stacked = np.transpose(images_stacked, [2, 1, 0])
-        gt = np.asarray(self.read_gt_file(idx)[start_frame_idx:start_frame_idx + self.T])
+        gt = block_reduce(gt, (8, ), np.mean)[start_frame_idx: start_frame_idx + self.T]
+        gt = np.mean(gt)
         return images_stacked, gt
 
 

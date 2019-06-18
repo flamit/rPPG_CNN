@@ -7,6 +7,8 @@ parser = ArgumentParser()
 parser.add_argument("--video_dir", type=str, default='videos', help="Directory video files are located")
 parser.add_argument("--image_dir", type=str, default='images',
                     help="Directory where face frames extracted from videos are located")
+parser.add_argument("--rotation", type=float, default=-90,
+                    help="This is used to rotate the video to the upright position so the face can be detected.")
 parser.add_argument("--max_frames", type=int, default=0,
                     help="Max number of frames to extract from a video, set to 0 to extract all frames")
 
@@ -28,4 +30,4 @@ if __name__ == '__main__':
         work_dir = os.path.join(args.image_dir, fn)
         if not os.path.exists(work_dir):
             os.makedirs(work_dir)
-        extract_and_write_face(video_filename, work_dir, args.max_frames)
+        extract_and_write_face(video_filename, work_dir, args.max_frames, args.rotation)

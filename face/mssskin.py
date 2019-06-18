@@ -54,7 +54,7 @@ def number_of_frames(video_path):
     cap = cv2.VideoCapture(video_path)
     return int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-def extract_and_write_face(video_path, write_dir, T=100):
+def extract_and_write_face(video_path, write_dir, T=100, rot=0):
     cap = cv2.VideoCapture(video_path)
     if T == 0:
         T = number_of_frames(video_path)
@@ -63,9 +63,8 @@ def extract_and_write_face(video_path, write_dir, T=100):
         ret, frame = cap.read()
 
         rows, cols, _ = frame.shape
-        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 0, 1)
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), rot, 1)
         dst = cv2.warpAffine(frame, M, (cols, rows))
-
         dims = get_forehead(dst)
         if dims.any():
             x, y, w, h = dims[0]
