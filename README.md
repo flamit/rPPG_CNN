@@ -17,8 +17,9 @@ To train the CNN, there are 3 steps:
 3. Train the CNN on the image dataset obtaines from step 2.
 
 # Pre-process the video files:
-Your video files should all be inside one folder.
-Then run the following command in your terminal: 
+Your video files should all be inside one folder. This step only needs to be done once. It is time consuming, but makes training, prototyping and testing the model afterwords fast. So once done, this step should not be repeated again, unless there are newer video files to convert.
+
+Run the following command in your terminal: 
 ```bash
 python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --rotation=-90 --max_frames=0
 ```
