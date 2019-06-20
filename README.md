@@ -3,12 +3,10 @@
 This repository hosts a CNN model for remote heart rate sensing using frames from a user's face as an input.
 
 # Pre-requisites
-1. Pytorch
-2. Numpy
-3. Pandas
-4. TensorboardX
-
-These can be installed using ```pip install <library-name>```
+To install all the required python packages, use the requirements.txt file. It is assumed you have Python (preferably Anaconda) already installed:
+```bash
+pip install -r requirements.txt
+```
 
 # Training
 To train the CNN, there are 3 steps:
