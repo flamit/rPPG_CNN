@@ -21,7 +21,7 @@ Run the following command in your terminal:
 ```bash
 python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --rotation=-90 --max_frames=0
 ```
-The ```rotation``` command is used to specify the rotation to apply on a single frame of video, sometimes it can happen that a video is played horizontally, making face detection fail, applying a rotation or 90 or -90 will fix this issue.
+If the video is rotated, the script automatically checks all rotations that are multiples of 90 for a face, whichever is found to contain a face, is used as the rotation fix for all frames.
 
 The ```max_frames=0``` command can be used to limit the number of frames to extract from the video to cut running time on the script (if the video is too long). Setting it to 0 means all frames are extracted from the video automatically.
 
