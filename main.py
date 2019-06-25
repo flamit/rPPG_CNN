@@ -8,6 +8,12 @@ from tensorboardX import SummaryWriter
 from losses import PearsonLoss
 
 
+#TODO VERIFY GROUNDTRUTH FOR PEARSON LOSS
+#TODO VERIFY INPUT SIGNAL
+#TODO VERIFY OPTIMIZATION FOR PEARSON
+#WARNING: PEARSON IS CRRENTLY NTESTED AND SHOULD NOT BE USED.
+
+
 parser = ArgumentParser()
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
