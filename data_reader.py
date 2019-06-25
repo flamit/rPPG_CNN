@@ -17,7 +17,7 @@ import os
 
 class FaceFrameReaderTrain(Dataset):
 
-    def __init__(self, dir_paths, image_size, T=100, n=16):
+    def __init__(self, dir_paths, image_size, loss_type, T=100, n=16):
         self.dir_paths = dir_paths
         self.image_names = [[x for x in os.listdir(y)] for y in dir_paths]
         self.image_size = image_size
@@ -25,6 +25,7 @@ class FaceFrameReaderTrain(Dataset):
         self.max_idx = [len(x) - T for x in dir_paths]
         self.n = n
         self.count = 0
+        self.loss_type = loss_type
         for image_names in self.image_names:
             self.count += len(image_names)
 
@@ -59,7 +60,8 @@ class FaceFrameReaderTrain(Dataset):
         images_stacked = np.concatenate(frames)
         images_stacked = np.transpose(images_stacked, [2, 1, 0])
         gt = block_reduce(gt, (8, ), np.mean)[start_frame_idx: start_frame_idx + self.T]
-        gt = np.mean(gt)
+        if self.loss_type == 'l1':
+            gt = np.mean(gt)
         return images_stacked, gt
 
 

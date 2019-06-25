@@ -1,10 +1,11 @@
 import os
 import torch
-from model import ResidualNet
+from models.resnet_attention import ResidualNet
 from argparse import ArgumentParser
 from torch.utils.data import DataLoader
 from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 from tensorboardX import SummaryWriter
+from losses import PearsonLoss
 
 
 parser = ArgumentParser()
@@ -19,7 +20,7 @@ parser.add_argument("--epochs", default=1, type=int, help="Number of complete pa
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
 parser.add_argument("--save_iter", default=5, type=int, help="Save a model ckpt after these iterations")
-
+parser.add_argument("--loss", default='pearson', type=str, help="The loss to use, use either 'l1' or 'pearson'")
 
 def get_data(image_dir):
     image_paths = [os.path.join(image_dir, x) for x in os.listdir(image_dir) if not x.endswith('.txt')]
@@ -31,12 +32,19 @@ def train(model, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     dir_names = get_data(args.image_dir)
-    data_pipeline = FaceFrameReaderTrain(dir_names, (args.image_size, args.image_size), args.T, args.N)
+    data_pipeline = FaceFrameReaderTrain(dir_names, (args.image_size, args.image_size), args.loss, args.T, args.N)
     data_queue = DataLoader(data_pipeline, shuffle=False, batch_size=args.batch_size, num_workers=args.n_threads)
 
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-    loss_function = torch.nn.L1Loss()
+    if args.loss == 'l1':
+        loss_function = torch.nn.L1Loss()
+    elif args.loss == 'pearson':
+        loss_function = PearsonLoss(args.T)
+    else:
+        print("Chosen loss not recognized")
+        raise
+
     model.to(device)
     model.train()
 
@@ -78,7 +86,7 @@ def predict(model, args):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    resnet18 = ResidualNet("ImageNet", 18, args.T, 'BAM')
+    resnet18 = ResidualNet("ImageNet", 18, args.T, 'BAM', args.loss)
     if args.train:
         train(resnet18, args)
     else:
