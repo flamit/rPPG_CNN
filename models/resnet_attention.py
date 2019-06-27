@@ -97,11 +97,10 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, layers, network_type, num_classes, att_type=None, loss_type='l1'):
+    def __init__(self, block, layers, network_type, num_classes, att_type=None):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.network_type = network_type
-        self.loss_type = loss_type
         # different model config between ImageNet and CIFAR
         if network_type == "ImageNet":
             self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -184,17 +183,16 @@ class ResNet(nn.Module):
             x = F.avg_pool2d(x, 4)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-        if self.loss_type == 'l1':
-            x = torch.mean(x, dim=1)
+
         return x
 
 
-def ResidualNet(network_type, depth, num_classes, att_type, loss_type):
+def ResidualNet(network_type, depth, num_classes, att_type):
     assert network_type in ["ImageNet", "CIFAR10", "CIFAR100"], "network type should be ImageNet or CIFAR10 / CIFAR100"
     assert depth in [18, 34, 50, 101], 'network depth should be 18, 34, 50 or 101'
 
     if depth == 18:
-        model = ResNet(BasicBlock, [2, 2, 2, 2], network_type, num_classes, att_type, loss_type)
+        model = ResNet(BasicBlock, [2, 2, 2, 2], network_type, num_classes, att_type)
 
     elif depth == 34:
         model = ResNet(BasicBlock, [3, 4, 6, 3], network_type, num_classes, att_type)
