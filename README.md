@@ -43,7 +43,7 @@ python main.py --image_dir=<path to directory containing images> --image_size=25
 It is critical the image_size, T and N parameters are the same as when they were during testing, since they define the CNN input and output shapes, changes in these parameters between train and test will cause the checkpoint weights to not load correctly. The output is saved in a text file in the folder "outputs" created in the project directory.
 
 # Note:
-It should be noted that the extracted face frames from the video are named using numbers because they can be sorted and mapped to the ground truth values using those numbers. Changing the naming schema of the image files will cause this mapping to break and should be kept in mind. Also, it is assumed that all frames in the video contain a face which is extracted, long sequences of missing faces will also break this mapping.
+It should be noted that the extracted face frames from the video are named using numbers because they can be sorted and mapped to the ground truth values using those numbers. Changing the naming schema of the image files will cause this mapping to break and should be kept in mind. Also, it is assumed that all frames in the video contain a face which is extracted, long sequences of missing faces will also break this mapping. It is also assumed that the videos are 30fps and ground truth is sampled at 256 samples a second (change in these will require a modification in the algorithmic logic).
 
 # Tensorboard:
 Tensorboardx allows us to save training run data in PyTorch. To monitor the loss function as training progresses, please start tensorboard by running the following script in the terminal:
