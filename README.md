@@ -31,9 +31,19 @@ Once the video processing is done, make sure that the ground truth files for eac
 # Training:
 Now training can be run. To start training the CNN, simply do:
 ```bash
-python main.py --images_dir=<path to images dir> --image_size=256 --T=64, --N=32 --batch_size=32 --n_threads=4 --epochs=5 --learning_rate=1e-3 --save_iter=200
+python main.py --train --image_dir=<path to images dir> --image_size=256 --T=64 --N=32 --batch_size=32 --n_threads=4 --epochs=5 --learning_rate=1e-3 --save_iter=200
 ```
 If you followed all the previous steps correctly, training should now run without problems. To read description of what each of the command line options do, read the "help" parameter in the main.py lines 11-21.
+
+# Prediction/Testing:
+To run a trained model on a set of images:
+```bash
+python main.py --image_dir=<path to directory containing images> --image_size=256 --T=64 --N=32 --ckpt=<path to saved checkpoint>
+```
+It is critical the image_size, T and N parameters are the same as when they were during testing, since they define the CNN input and output shapes, changes in these parameters between train and test will cause the checkpoint weights to not load correctly. The output is saved in a text file in the folder "outputs" created in the project directory.
+
+# Note:
+It should be noted that the extracted face frames from the video are named using numbers because they can be sorted and mapped to the ground truth values using those numbers. Changing the naming schema of the image files will cause this mapping to break and should be kept in mind. Also, it is assumed that all frames in the video contain a face which is extracted, long sequences of missing faces will also break this mapping.
 
 # Tensorboard:
 Tensorboardx allows us to save training run data in PyTorch. To monitor the loss function as training progresses, please start tensorboard by running the following script in the terminal:
@@ -44,8 +54,8 @@ Then open up your browser and navigate to "localhost:6006" to display the visual
 
 # TODOs:
 1. Bug fixes.
-2. Make data pipeline better.
-3. Make face detector robust to rotation.
-4. Make the predict function run correctly.
+2. ~~Make data pipeline better.~~
+3. ~~Make face detector robust to rotation.~~
+4. ~~Make the predict function run correctly.~~
 5. Maybe changes in the algorithmic logic.
 6. Verify the rPPG input signal as being correct.
