@@ -204,21 +204,3 @@ def ResidualNet(network_type, depth, num_classes, att_type):
         model = ResNet(Bottleneck, [3, 4, 23, 3], network_type, num_classes, att_type)
 
     return model
-
-
-if __name__ == "__main__":
-
-    from data_reader import FaceFrameReader
-    from torch.utils.data import DataLoader
-    import os
-
-    image_paths = [os.path.join('images', x) for x in os.listdir('images') if x.endswith('.png')]
-    ffr = FaceFrameReader(image_paths, (256, 256), T=128)
-    dataloader = DataLoader(ffr, batch_size=2,
-                            shuffle=False, num_workers=4)
-
-    net = ResidualNet("ImageNet", depth=18, num_classes=128, att_type='BAM')
-    for data in dataloader:
-        logits = net(data.float())
-        print(logits)
-        break

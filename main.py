@@ -1,6 +1,7 @@
 import os
 import torch
 from tqdm import tqdm
+from models.sknet import SKNet
 from losses import PearsonLoss
 from argparse import ArgumentParser
 from tensorboardX import SummaryWriter
@@ -11,6 +12,7 @@ from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 parser = ArgumentParser()
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
+parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn"], help="CNN model to use")
 parser.add_argument("--T", default=64, type=int, help="Number of frames to stack")
 parser.add_argument("--N", default=32, type=int, help="Number of grids to divide the image into")
 parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs in a batch")
@@ -98,8 +100,13 @@ def predict(model, args):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    resnet18 = ResidualNet("ImageNet", 18, args.T, 'BAM')
-    if args.train:
-        train(resnet18, args)
+    if args.model == "resnet":
+        model = ResidualNet("ImageNet", 18, args.T, 'BAM')
+    elif args.model == "skn":
+        model = SKNet(args.T)
     else:
-        predict(resnet18, args)
+        raise ValueError("Model name provided is invalid")
+    if args.train:
+        train(model, args)
+    else:
+        predict(model, args)

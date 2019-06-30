@@ -7,7 +7,7 @@ parser = ArgumentParser()
 parser.add_argument("--video_dir", type=str, default='videos', help="Directory video files are located")
 parser.add_argument("--image_dir", type=str, default='images',
                     help="Directory where face frames extracted from videos are located")
-parser.add_argument("--max_frames", type=int, default=256,
+parser.add_argument("--max_frames", type=int, default=0,
                     help="Max number of frames to extract from a video, set to 0 to extract all frames")
 
 

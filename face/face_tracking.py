@@ -5,7 +5,7 @@ import requests
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger('Face Tracking')
-MODEL_PATH = pathlib.Path('model')
+MODEL_PATH = pathlib.Path('face/model')
 HARR_PATH = MODEL_PATH / 'haarcascade_frontalface_default.xml'
 HARR_URL = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml'
 if not HARR_PATH.is_file():
