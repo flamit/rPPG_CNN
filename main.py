@@ -101,9 +101,9 @@ def predict(model, args):
 if __name__ == "__main__":
     args = parser.parse_args()
     if args.model == "resnet":
-        model = ResidualNet("ImageNet", 18, args.T, 'BAM')
+        model = ResidualNet("ImageNet", 50, args.T, 'BAM')
     elif args.model == "skn":
-        model = SKNet(args.T)
+        model = SKNet(args.T, [3, 4, 6, 3])
     else:
         raise ValueError("Model name provided is invalid")
     if args.train:
