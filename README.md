@@ -10,7 +10,7 @@ pip install -r requirements.txt
 # Supported models:
 Currently, the following models can be trained in the rPPG framework:
 1. "resnet" for a resnet of depth 18.
-2. "skn" for selective kernel networks of depth 50.
+2. "skn" for selective kernel networks of depth 20.
 
 # Training
 To train the CNN, there are 3 steps:
