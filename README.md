@@ -15,11 +15,11 @@ To train the CNN, there are 3 steps:
 3. Train the CNN on the image dataset obtaines from step 2.
 
 # Pre-process the video files:
-Your video files should all be inside one folder. This step only needs to be done once. It is time consuming, but makes training, prototyping and testing the model afterwords fast. So once done, this step should not be repeated again, unless there are newer video files to convert.
+Your video files should all be inside one folder and there should be nothing else in that folder. This step only needs to be done once. It is time consuming, but makes training, prototyping and testing the model afterwords fast. So once done, this step should not be repeated again, unless there are newer video files to convert.
 
 Run the following command in your terminal: 
 ```bash
-python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --rotation=-90 --max_frames=0
+python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --max_frames=0
 ```
 If the video is rotated, the script automatically checks all rotations that are multiples of 90 for a face, whichever is found to contain a face, is used as the rotation fix for all frames.
 
@@ -31,7 +31,7 @@ Once the video processing is done, make sure that the ground truth files for eac
 # Training:
 Now training can be run. To start training the CNN, simply do:
 ```bash
-python main.py --train --image_dir=<path to images dir> --image_size=256 --T=64 --N=32 --batch_size=32 --n_threads=4 --epochs=5 --learning_rate=1e-3 --save_iter=200
+python main.py --train --image_dir=<path to images dir> --image_size=256 --T=64 --N=32 --batch_size=32 --n_threads=4 --epochs=5 --lr=1e-3 --save_iter=200
 ```
 If you followed all the previous steps correctly, training should now run without problems. To read description of what each of the command line options do, read the "help" parameter in the main.py lines 11-21.
 
