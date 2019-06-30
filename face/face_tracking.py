@@ -1,12 +1,11 @@
-
 import logging
-
+import pathlib
 import cv2
 import requests
-from mssskin import MODEL_PATH
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger('Face Tracking')
+MODEL_PATH = pathlib.Path('model')
 HARR_PATH = MODEL_PATH / 'haarcascade_frontalface_default.xml'
 HARR_URL = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml'
 if not HARR_PATH.is_file():
