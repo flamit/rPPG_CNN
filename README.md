@@ -12,6 +12,8 @@ Currently, the following models can be trained in the rPPG framework:
 1. "resnet" for a resnet of depth 18.
 2. "skn" for selective kernel networks of depth 20.
 
+Network depths are not standardized/comparable, this is something to work on. Can also consider using deeper versions for better feature extraction.
+
 # Training
 To train the CNN, there are 3 steps:
 1. Pre-processing the video to convert it into an image dataset.
