@@ -7,17 +7,18 @@ from argparse import ArgumentParser
 from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 from models.resnet_attention import ResidualNet
+from models.resnet_attention_aug import ResidualNetAttn
 from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 
 parser = ArgumentParser()
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
-parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn"], help="CNN model to use")
+parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn", 'attn'], help="CNN model to use")
 parser.add_argument("--T", default=64, type=int, help="Number of frames to stack")
 parser.add_argument("--N", default=32, type=int, help="Number of grids to divide the image into")
 parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs in a batch")
 parser.add_argument("--n_threads", default=4, type=int, help="Number of workers for data pipeline")
-parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
+parser.add_argument("--train", default=True, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--epochs", default=1, type=int, help="Number of complete passes over data to train for")
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
@@ -101,9 +102,12 @@ def predict(model, args):
 if __name__ == "__main__":
     args = parser.parse_args()
     if args.model == "resnet":
-        model = ResidualNet("ImageNet", 50, args.T, 'BAM')
+        model = ResidualNet("ImageNet", 50, args.T, 'CBAM')
     elif args.model == "skn":
         model = SKNet(args.T, [3, 4, 6, 3])
+    elif args.model == "attn":
+        size = (args.image_size // args.N) ** 2
+        model = ResidualNetAttn(args.T, size)
     else:
         raise ValueError("Model name provided is invalid")
     if args.train:
