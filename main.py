@@ -18,7 +18,7 @@ parser.add_argument("--T", default=64, type=int, help="Number of frames to stack
 parser.add_argument("--N", default=32, type=int, help="Number of grids to divide the image into")
 parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs in a batch")
 parser.add_argument("--n_threads", default=4, type=int, help="Number of workers for data pipeline")
-parser.add_argument("--train", default=True, action='store_true', help="Whether training or evaluating")
+parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--epochs", default=1, type=int, help="Number of complete passes over data to train for")
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
