@@ -12,6 +12,7 @@ Currently, the following models can be trained in the rPPG framework:
 1. "resnet" for a resnet of depth 50.
 2. "skn" for selective kernel networks of depth 50.
 3. "attn" for a resnet50 with each 3x3 convolution replaced by an attention augmented convolution block.
+4. "diag" for a resnet50 with channel attention + attentionRNN.
 
 # Training
 To train the CNN, there are 3 steps:
