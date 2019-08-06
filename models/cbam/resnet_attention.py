@@ -1,6 +1,6 @@
 from torch.nn import init
-from models.cbam import *
-from models.bam import *
+from models.cbam.bam import *
+from models.cbam.cbam import *
 
 
 def conv3x3(in_planes, out_planes, stride=1):

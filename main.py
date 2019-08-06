@@ -1,26 +1,27 @@
 import os
 import torch
 from tqdm import tqdm
-from models.sknet import SKNet
+from models.sknet.sknet import SKNet
 from losses import PearsonLoss
 from argparse import ArgumentParser
 from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
-from models.resnet_attention import ResidualNet
-from models.resnet_diagattn import ResidualNetDiag
-from models.resnet_attention_aug import ResidualNetAttn
+from models.cbam.resnet_attention import ResidualNet
+from models.diaglstm.resnet_diagattn import ResidualNetDiag
+from models.attention_aug.resnet_attention_aug import ResidualNetAttn
+from models.gsop.gsop import resnet50gsop
 from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 
 parser = ArgumentParser()
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
-parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn", 'attn', 'diag'],
+parser.add_argument("--model", default="gsop", type=str, choices=["resnet", "skn", 'attn', 'diag', 'gsop'],
                     help="CNN model to use")
 parser.add_argument("--T", default=64, type=int, help="Number of frames to stack")
 parser.add_argument("--N", default=32, type=int, help="Number of grids to divide the image into")
 parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs in a batch")
 parser.add_argument("--n_threads", default=4, type=int, help="Number of workers for data pipeline")
-parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
+parser.add_argument("--train", default=True, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--epochs", default=1, type=int, help="Number of complete passes over data to train for")
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
@@ -112,6 +113,9 @@ if __name__ == "__main__":
         model = ResidualNetAttn(args.T, size)
     elif args.model == "diag":
         model = ResidualNetDiag("ImageNet", 50, args.T, "BAM")
+    elif args.model == "gsop":
+        attn_pos = [['0'] * 2 + ['1'], ['0'] * 3 + ['1'], ['0'] * 22 + ['1'], ['0'] * 3]  # Mode 2
+        model = resnet50gsop(False, attn_pos, 128, GSoP_mode=2, num_classes=args.T)
     else:
         raise ValueError("Model name provided is invalid")
     if args.train:
