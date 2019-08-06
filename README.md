@@ -13,6 +13,7 @@ Currently, the following models can be trained in the rPPG framework:
 2. "skn" for selective kernel networks of depth 50.
 3. "attn" for a resnet50 with each 3x3 convolution replaced by an attention augmented convolution block.
 4. "diag" for a resnet50 with channel attention + attentionRNN.
+5. "gsop" for a resnet50 with Global Second Order Pooling (mode 2).
 
 # Training
 To train the CNN, there are 3 steps:
@@ -65,4 +66,4 @@ Then open up your browser and navigate to "localhost:6006" to display the visual
 3. ~~Make face detector robust to rotation.~~
 4. ~~Make the predict function run correctly.~~
 5. Maybe changes in the algorithmic logic.
-6. Verify the rPPG input signal as being correct.
+6. ~~Verify the rPPG input signal as being correct.~~
