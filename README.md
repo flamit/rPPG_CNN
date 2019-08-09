@@ -14,7 +14,7 @@ Currently, the following models can be trained in the rPPG framework:
 3. "attn" for a resnet50 with each 3x3 convolution replaced by an attention augmented convolution block.
 4. "diag" for a resnet50 with channel attention + attentionRNN.
 5. "gsop" for a resnet50 with Global Second Order Pooling (mode 2).
-6. Relation aware global attention is currently under development. The RGA-S and RGA-C modules are implemented. They require some cleanup/verification and then need to be integrated into a resnet model. The status will be updated here when ready for use.
+6. "rga" for a resnet50 with Relation aware global pooling. To use this mode, please ensure that the "image_size", "T" and "N" parameters are set in such a way that the input shape is at least 128x128. Anything smaller cannot be processed by RGA module. The two spatial dimensions can also be unequal, this is allowed.
 
 # Training
 To train the CNN, there are 3 steps:
