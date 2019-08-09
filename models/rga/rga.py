@@ -4,36 +4,37 @@ import torch.nn.functional as F
 
 
 class RGAS(nn.Module):
-    def __init__(self, inplanes, h, w, s, affinity_out, s2):
+    def __init__(self, inplanes, h, w, s1, affinity_out, s2):
         super(RGAS, self).__init__()
-        self.s = s
-        self.conv1 = nn.Conv2d(inplanes, inplanes // s, kernel_size=1)
-        self.bn1 = nn.BatchNorm2d(inplanes // s)
-        self.conv2 = nn.Conv2d(inplanes, inplanes // s, kernel_size=1)
-        self.bn2 = nn.BatchNorm2d(inplanes // s)
+        self.outplanes1 = int(inplanes // s1)
+        self.conv1 = nn.Conv2d(inplanes, self.outplanes1, kernel_size=1)
+        self.bn1 = nn.BatchNorm2d(self.outplanes1)
+        self.conv2 = nn.Conv2d(inplanes, self.outplanes1, kernel_size=1)
+        self.bn2 = nn.BatchNorm2d(self.outplanes1)
         self.relu = nn.ReLU()
 
-        self.conv3 = nn.Conv2d(inplanes, inplanes // s, kernel_size=1)
-        self.bn3 = nn.BatchNorm2d(inplanes // s)
+        self.conv3 = nn.Conv2d(inplanes, self.outplanes1, kernel_size=1)
+        self.bn3 = nn.BatchNorm2d(self.outplanes1)
         self.conv4 = nn.Conv2d(h * w, affinity_out, kernel_size=1)
         self.bn4 = nn.BatchNorm2d(affinity_out)
 
         current_feats = 1 + affinity_out * 2
-        self.conv5 = nn.Conv2d(current_feats, current_feats // s2, kernel_size=1)
-        self.bn5 = nn.BatchNorm2d(current_feats // s2)
-        self.conv6 = nn.Conv2d(current_feats // s2, 1, kernel_size=1)
+        self.outplanes2 = int(current_feats // s2)
+        self.conv5 = nn.Conv2d(current_feats, self.outplanes2, kernel_size=1)
+        self.bn5 = nn.BatchNorm2d(self.outplanes2)
+        self.conv6 = nn.Conv2d(self.outplanes2, 1, kernel_size=1)
         self.sig = nn.Sigmoid()
 
     def forward(self, x):
         b, c, h, w = x.shape
         # Embed x using the two functions:
-        theta = self.relu(self.bn1(self.conv1(x))).view(-1, c // self.s, h * w)
-        phi = self.relu(self.bn2(self.conv2(x))).view(-1, c // self.s, h * w)
+        theta = self.relu(self.bn1(self.conv1(x))).view(-1, self.outplanes1, h * w)
+        phi = self.relu(self.bn2(self.conv2(x))).view(-1, self.outplanes1, h * w)
         affinity = torch.zeros(size=[b, h * w, h * w])
         # Calculate affinity as convolution over each batch for faster computation:
         for batch in range(b):
-            kernel = phi[batch].permute(1, 0).view(h * w, c // self.s, 1, 1)
-            r = F.conv2d(theta[batch].view(1, c // self.s, h, w), kernel).view(h * w, h * w)
+            kernel = phi[batch].permute(1, 0).view(h * w, self.outplanes1, 1, 1)
+            r = F.conv2d(theta[batch].view(1, self.outplanes1, h, w), kernel).view(h * w, h * w)
             affinity[batch] = r
         # Take out affinity row wise and column wise and reshape to image dimensions.
         affinity_a = affinity.view(b, -1, h, w)
@@ -53,13 +54,13 @@ class RGAS(nn.Module):
 
 # TODO Code cleanup and verification, add to resnet.
 class RGAC(nn.Module):
-    def __init__(self, inplanes, h, w, s, affinity_out, s2):
+    def __init__(self, inplanes, h, w, s):
         super(RGAC, self).__init__()
-        self.s = s
-        self.conv1 = nn.Conv2d(h * w, h * w // s, kernel_size=1)
-        self.bn1 = nn.BatchNorm2d(h * w // s)
-        self.conv2 = nn.Conv2d(h * w, h * w // s, kernel_size=1)
-        self.bn2 = nn.BatchNorm2d(h * w // s)
+        self.outplanes = int(h * w // s)
+        self.conv1 = nn.Conv2d(h * w, self.outplanes, kernel_size=1)
+        self.bn1 = nn.BatchNorm2d(self.outplanes)
+        self.conv2 = nn.Conv2d(h * w, self.outplanes, kernel_size=1)
+        self.bn2 = nn.BatchNorm2d(self.outplanes)
         self.relu = nn.ReLU()
 
         self.conv3 = nn.Conv2d(inplanes, inplanes, kernel_size=1)
@@ -82,8 +83,21 @@ class RGAC(nn.Module):
         # Take out affinity row wise and column wise and reshape to image dimensions.
         affinity_a = affinity.view(b, -1, c, c).permute(0, 2, 1, 3)
         affinity_b = affinity.permute(0, 2, 1).view(b, -1, c, c).permute(0, 2, 1, 3)
-
         x_embed = self.relu(self.bn3(self.conv3(x))).mean(dim=3, keepdim=True).mean(dim=2, keepdim=True).permute(0, 2, 3, 1)  # Mean pool over space
         y = torch.cat([x_embed, affinity_a, affinity_b], dim=1)
         a = self.sig(self.conv4(y)).permute(0, 3, 1, 2)
+
         return x * a
+
+
+class RGA(nn.Module):
+    def __init__(self, inplanes, h, w, s1, affinity_out, s2):
+        super(RGA, self).__init__()
+        self.rgas = RGAS(inplanes, h, w, s1, affinity_out, s2)
+        self.rgac = RGAC(inplanes, h, w, s1)
+
+    def forward(self, x):
+        x = self.rgas(x)
+        x = self.rgac(x)
+
+        return x
