@@ -14,7 +14,7 @@ Currently, the following models can be trained in the rPPG framework:
 3. "attn" for a resnet50 with each 3x3 convolution replaced by an attention augmented convolution block.
 4. "diag" for a resnet50 with channel attention + attentionRNN.
 5. "gsop" for a resnet50 with Global Second Order Pooling (mode 2).
-6. "rga" for a resnet50 with Relation aware global pooling. To use this mode, please ensure that the "image_size", "T" and "N" parameters are set in such a way that the input shape is at least 128x128. Anything smaller cannot be processed by RGA module. The two spatial dimensions can also be unequal, this is allowed.
+6. "rga" for a resnet50 with Relation aware global pooling. To use this model, please ensure that the "image_size", "T" and "N" parameters are set in such a way that the input shape is at least 128x128. Anything smaller cannot be processed by the RGA module. The two spatial dimensions can also be unequal, this is allowed, as long as they are greater than 128.
 
 # Training
 To train the CNN, there are 3 steps:
@@ -49,10 +49,10 @@ To run a trained model on a set of images:
 ```bash
 python main.py --model=<model name> --image_dir=<path to directory containing images> --image_size=256 --T=64 --N=32 --ckpt=<path to saved checkpoint>
 ```
-It is critical the image_size, T and N parameters are the same as when they were during testing, since they define the CNN input and output shapes, changes in these parameters between train and test will cause the checkpoint weights to not load correctly. The output is saved in a text file in the folder "outputs" created in the project directory.
+It is critical the image_size, T and N parameters are the same as when they were during training, since they define the CNN input and output shapes, changes in these parameters between train and test will cause the checkpoint weights to not load correctly. The output is saved in a text file in the folder "outputs" created in the project directory.
 
 # Note:
-It should be noted that the extracted face frames from the video are named using numbers because they can be sorted and mapped to the ground truth values using those numbers. Changing the naming schema of the image files will cause this mapping to break and should be kept in mind. Also, it is assumed that all frames in the video contain a face which is extracted, long sequences of missing faces will also break this mapping. It is also assumed that the videos are 30fps and ground truth is sampled at 256 samples a second (change in these will require a modification in the algorithmic logic).
+The extracted face frames from the video are named using numbers because they can be sorted and mapped to the ground truth values using those numbers. Changing the naming schema of the image files will cause this mapping to break and should be kept in mind. Also, it is assumed that all frames in the video contain a face which is extracted, long sequences of missing faces will also break this mapping. It is also assumed that the videos are 30fps and ground truth is sampled at 256 samples a second (change in these will require a modification in the algorithmic logic).
 
 # Tensorboard:
 Tensorboardx allows us to save training run data in PyTorch. To monitor the loss function as training progresses, please start tensorboard by running the following script in the terminal:
