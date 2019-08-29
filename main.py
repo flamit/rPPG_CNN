@@ -14,20 +14,22 @@ from models.gsop.gsop import resnet50gsop
 from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 
 parser = ArgumentParser()
+parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
 parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn", 'attn', 'diag', 'gsop', 'rga'],
                     help="CNN model to use")
 parser.add_argument("--T", default=64, type=int, help="Number of frames to stack")
 parser.add_argument("--N", default=32, type=int, help="Number of grids to divide the image into")
+parser.add_argument("--magnification", default=4, type=int,
+                    help="Skin color magnification factor, if 0, no magnification is used.")
 parser.add_argument("--batch_size", default=4, type=int, help="Number of inputs in a batch")
 parser.add_argument("--n_threads", default=4, type=int, help="Number of workers for data pipeline")
-parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--epochs", default=1, type=int, help="Number of complete passes over data to train for")
 parser.add_argument("--lr", default=1e-3, type=float, help="Learning rate for the optimizer")
 parser.add_argument("--save_dir", default='ckpt', type=str, help="Directory for saving trained models")
 parser.add_argument("--save_iter", default=50, type=int, help="Save a model ckpt after these iterations")
-parser.add_argument("--ckpt", default='ckpt/checkpoint_0_50.pth', type=str,
+parser.add_argument("--ckpt", default='ckpt/checkpoint_0_0.pth', type=str,
                     help="Path to checkpoint to use when testing")
 
 
@@ -44,7 +46,11 @@ def train(model, args):
     dir_names = [os.path.join(args.image_dir, x) for x in os.listdir(args.image_dir) if not x.endswith('.txt')]
 
     # Initialize the multi-threaded data pipeline
-    data_pipeline = FaceFrameReaderTrain(dir_names, (args.image_size, args.image_size), args.T, args.N)
+    data_pipeline = FaceFrameReaderTrain(dir_paths=dir_names,
+                                         image_size=(args.image_size, args.image_size),
+                                         T=args.T,
+                                         n=args.N,
+                                         magnification=args.magnification)
     data_queue = DataLoader(data_pipeline, shuffle=False, batch_size=args.batch_size, num_workers=args.n_threads)
 
     # Initialize optimizer and loss
@@ -80,7 +86,8 @@ def train(model, args):
 def predict(model, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    data_pipeline = FaceFrameReaderTest(args.image_dir, (args.image_size, args.image_size), args.T, args.N)
+    data_pipeline = FaceFrameReaderTest(args.image_dir, (args.image_size, args.image_size), args.T, args.N,
+                                        args.magnification)
     data_queue = DataLoader(data_pipeline, shuffle=False, batch_size=1, num_workers=1)
 
     model.load_state_dict(torch.load(args.ckpt))

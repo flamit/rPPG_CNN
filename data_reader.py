@@ -6,11 +6,12 @@ import csv
 import cv2
 import os
 
+import matplotlib.pyplot as plt
 
 class FaceFrameReaderTrain(Dataset):
     """Face frame reader for training the rPPG CNN"""
 
-    def __init__(self, dir_paths, image_size, T=100, n=16):
+    def __init__(self, dir_paths, image_size, T=100, n=16, magnification=0):
         """
         Initializes the data reader for training.
         :param dir_paths: Path to directory containing directories of images of each video file.
@@ -26,6 +27,7 @@ class FaceFrameReaderTrain(Dataset):
         self.max_idx = [len(x) - T for x in dir_paths]
         self.n = n
         self.count = 0
+        self.magnification = magnification
         for image_names in self.image_names:
             self.count += len(image_names)
 
@@ -69,7 +71,14 @@ class FaceFrameReaderTrain(Dataset):
         for i in range(start_frame_idx, start_frame_idx + self.T):
             path = os.path.join(self.dir_paths[idx], self.image_names[idx][i])
             image = cv2.imread(path, 1)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+            if self.magnification:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
+                cr_mean = np.mean(image[..., 1])
+                cb_mean = np.mean(image[..., 2])
+                image[..., 1] = cr_mean + (image[..., 1] - cr_mean) * self.magnification
+                image[..., 2] = cb_mean + (image[..., 2] - cb_mean) * self.magnification
+            else:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
             image = cv2.resize(image, self.image_size)
             image = block_reduce(image, (self.n, self.n, 1), np.mean)
             image = np.reshape(image, [1, -1, 3])
@@ -83,7 +92,7 @@ class FaceFrameReaderTrain(Dataset):
 class FaceFrameReaderTest(Dataset):
     """Face frame reader for Testing/Predictions only."""
 
-    def __init__(self, image_dir, image_size, T=100, n=16):
+    def __init__(self, image_dir, image_size, T=100, n=16, magnification=0):
         """
         Initializes the data reader for training.
         :param image_dir: Path to directory containing images to predict on.
@@ -100,6 +109,7 @@ class FaceFrameReaderTest(Dataset):
         self.T = T
         self.n = n
         self.count = 0
+        self.magnification = magnification
 
     def __len__(self):
         return int(len(self.image_names) / self.T)
@@ -110,7 +120,14 @@ class FaceFrameReaderTest(Dataset):
         for i in range(idx, idx + self.T):
             path = os.path.join(self.image_dir, self.image_names[i])
             image = cv2.imread(path, 1)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
+            if self.magnification:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2YCrCb)
+                cr_mean = np.mean(image[..., 1])
+                cb_mean = np.mean(image[..., 2])
+                image[..., 1] = cr_mean + (image[..., 1] - cr_mean) * self.magnification
+                image[..., 2] = cb_mean + (image[..., 2] - cb_mean) * self.magnification
+            else:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
             image = cv2.resize(image, self.image_size)
             image = block_reduce(image, (self.n, self.n, 1), np.mean)
             image = np.reshape(image, [1, -1, 3])
