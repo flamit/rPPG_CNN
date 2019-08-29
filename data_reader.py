@@ -6,7 +6,6 @@ import csv
 import cv2
 import os
 
-import matplotlib.pyplot as plt
 
 class FaceFrameReaderTrain(Dataset):
     """Face frame reader for training the rPPG CNN"""
