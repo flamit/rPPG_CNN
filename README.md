@@ -39,8 +39,10 @@ Once the video processing is done, make sure that the ground truth files for eac
 # Training:
 Now training can be run. To start training the CNN, simply do:
 ```bash
-python main.py --train --model=<model name> --image_dir=<path to images dir> --image_size=256 --T=64 --N=32 --batch_size=32 --n_threads=4 --epochs=5 --lr=1e-3 --save_iter=200
+python main.py --train --model=<model name> --image_dir=<path to images dir> --image_size=256 --T=64 --N=32 --batch_size=32 --n_threads=4 --epochs=5 --lr=1e-3 --save_iter=200 --magnification=0
 ```
+
+If you set "--magnification" to any value greater than 0, skin color magnification will be used as the magnification factor. Setting it to 0 turns skin color magnification off.
 
 If you followed all the previous steps correctly, training should now run without problems. To read description of what each of the command line options do, read the "help" parameter in the main.py lines 11-21.
 
