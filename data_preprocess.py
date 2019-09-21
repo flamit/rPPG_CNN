@@ -1,4 +1,4 @@
-from face.mssskin import extract_and_write_face
+from face.detect_and_align import extract_and_write_face
 from argparse import ArgumentParser
 from tqdm import tqdm
 import os
