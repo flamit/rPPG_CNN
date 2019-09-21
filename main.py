@@ -56,7 +56,7 @@ def train(model, args):
 
     # Initialize optimizer and loss
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
-    loss_function = PearsonLoss(args.T)
+    loss_function = PearsonLoss(args.T).to(device)
 
     # Send model to training device (gpu or cpu) and set it to train:
     model.to(device)
