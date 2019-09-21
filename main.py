@@ -41,6 +41,7 @@ def train(model, args):
     :return: None
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Training on device:", device)
 
     # Find all directories containing face image fames:
     dir_names = [os.path.join(args.image_dir, x) for x in os.listdir(args.image_dir) if not x.endswith('.txt')]
@@ -85,6 +86,7 @@ def train(model, args):
 
 def predict(model, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Predicting on device:", device)
 
     data_pipeline = FaceFrameReaderTest(args.image_dir, (args.image_size, args.image_size), args.T, args.N,
                                         args.magnification)
