@@ -16,6 +16,8 @@ from data_reader import FaceFrameReaderTrain, FaceFrameReaderTest
 parser = ArgumentParser()
 parser.add_argument("--train", default=False, action='store_true', help="Whether training or evaluating")
 parser.add_argument("--image_dir", default="images", type=str, help="Directory where images are located")
+parser.add_argument("--loss", default="pearson", type=str, choices=['mse', 'pearson'],
+                    help="Loss function to use for training.")
 parser.add_argument("--image_size", default=256, type=int, help="Face image size")
 parser.add_argument("--model", default="resnet", type=str, choices=["resnet", "skn", 'attn', 'diag', 'gsop', 'rga'],
                     help="CNN model to use")
@@ -56,7 +58,12 @@ def train(model, args):
 
     # Initialize optimizer and loss
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
-    loss_function = PearsonLoss(args.T).to(device)
+    if args.loss == 'mse':
+        loss_function = torch.nn.MSELoss().to(device)
+    elif args.loss == 'pearson':
+        loss_function = PearsonLoss(args.T).to(device)
+    else:
+        raise ValueError("Choice of loss function is incorrect, either select mse or pearson.")
 
     # Send model to training device (gpu or cpu) and set it to train:
     model.to(device)
