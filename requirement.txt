@@ -13,3 +13,4 @@ torch==1.1.0
 torchvision==0.3.0
 tqdm==4.31.1
 dlib==19.17.0
+wget==3.2

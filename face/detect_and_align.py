@@ -1,7 +1,10 @@
 import os
 import cv2
 import dlib
+import torch
+import numpy as np
 from tqdm import trange
+from face.linknet import LinkNet34
 
 
 def number_of_frames(video_path):
@@ -9,7 +12,7 @@ def number_of_frames(video_path):
     return int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 
-def extract_and_write_face(video_path, write_dir, T=100):
+def extract_and_write_face(video_path, write_dir, T=100, skin=False):
     cap = cv2.VideoCapture(video_path)
     if T == 0:
         T = number_of_frames(video_path)
@@ -17,6 +20,11 @@ def extract_and_write_face(video_path, write_dir, T=100):
     predictor_path = 'face/model/predictor.dat'
     detector = dlib.get_frontal_face_detector()
     sp = dlib.shape_predictor(predictor_path)
+
+    if skin:
+        linknet = LinkNet34()
+        device = 'gpu' if torch.cuda.is_available() else 'cpu'
+        linknet.load_state_dict(torch.load('face/model/linknet.pth', map_location=device))
 
     rot = 90
     ret, frame = cap.read()
@@ -46,7 +54,13 @@ def extract_and_write_face(video_path, write_dir, T=100):
         for detection in dets:
             faces.append(sp(img, detection))
         images = dlib.get_face_chips(img, faces, size=320)
-        images = cv2.cvtColor(images[0], cv2.COLOR_RGB2BGR)
+        if skin:
+            images = np.transpose(images, [0, 3, 1, 2])
+            skin_mask = linknet(torch.Tensor(images)).data.cpu().numpy() > 0.5
+            skin_pixels = images * skin_mask
+            skin_pixels = np.transpose(skin_pixels, [0, 2, 3, 1])
+            images = cv2.cvtColor(skin_pixels[0], cv2.COLOR_RGB2BGR)
+        else:
+            images = cv2.cvtColor(images[0], cv2.COLOR_RGB2BGR)
         cv2.imwrite(os.path.join(write_dir, '{0}.png'.format(i)), images)
         ret, frame = cap.read()
-
