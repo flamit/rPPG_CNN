@@ -10,7 +10,7 @@ parser.add_argument("--image_dir", type=str, default='images',
                     help="Directory where face frames extracted from videos are located")
 parser.add_argument("--max_frames", type=int, default=0,
                     help="Max number of frames to extract from a video, set to 0 to extract all frames")
-parser.add_argument("--skin", default=True, action='store_true',
+parser.add_argument("--skin", default=False, action='store_true',
                     help="Whether to use skin segmentation when extracting frames")
 
 
