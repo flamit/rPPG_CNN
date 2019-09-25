@@ -23,7 +23,7 @@ def extract_and_write_face(video_path, write_dir, T=100, skin=False):
 
     if skin:
         linknet = LinkNet34()
-        device = 'gpu' if torch.cuda.is_available() else 'cpu'
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
         linknet.load_state_dict(torch.load('face/model/linknet.pth', map_location=device))
 
     rot = 90
