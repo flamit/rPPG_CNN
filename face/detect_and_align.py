@@ -2,9 +2,9 @@ import os
 import cv2
 import dlib
 import torch
-import numpy as np
 from tqdm import trange
 from face.linknet import LinkNet34
+import torchvision.transforms as transforms
 
 
 def number_of_frames(video_path):
@@ -22,9 +22,14 @@ def extract_and_write_face(video_path, write_dir, T=100, skin=False):
     sp = dlib.shape_predictor(predictor_path)
 
     if skin:
+        trans = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                         std=[0.229, 0.224, 0.225],
+                                                         inplace=False)])
         linknet = LinkNet34()
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         linknet.load_state_dict(torch.load('face/model/linknet.pth', map_location=device))
+        linknet.eval()
 
     rot = 90
     ret, frame = cap.read()
@@ -55,10 +60,9 @@ def extract_and_write_face(video_path, write_dir, T=100, skin=False):
             faces.append(sp(img, detection))
         images = dlib.get_face_chips(img, faces, size=320)
         if skin:
-            images = np.transpose(images, [0, 3, 1, 2])
-            skin_mask = linknet(torch.Tensor(images)).data.cpu().numpy() > 0.5
+            trans_images = trans(images[0])
+            skin_mask = linknet(trans_images.unsqueeze(0)).permute(0, 2, 3, 1).data.cpu().numpy()
             skin_pixels = images * skin_mask
-            skin_pixels = np.transpose(skin_pixels, [0, 2, 3, 1])
             images = cv2.cvtColor(skin_pixels[0], cv2.COLOR_RGB2BGR)
         else:
             images = cv2.cvtColor(images[0], cv2.COLOR_RGB2BGR)
