@@ -7,6 +7,8 @@ To install all the required python packages, use the requirements.txt file. It i
 ```bash
 pip install -r requirements.txt
 ```
+Furthermore, please install an appropriate version of PyTorch by choosing your system config from the official webpage [here.](https://pytorch.org/)
+
 # Supported models:
 Currently, the following models can be trained in the rPPG framework:
 1. "resnet" for a resnet of depth 50.
@@ -27,11 +29,13 @@ Your video files should all be inside one folder and there should be nothing els
 
 Run the following command in your terminal: 
 ```bash
-python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --max_frames=0
+python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --max_frames=0 --skin=True
 ```
 If the video is rotated, the script automatically checks all rotations that are multiples of 90 for a face, whichever is found to contain a face, is used as the rotation fix for all frames.
 
 The ```max_frames=0``` command can be used to limit the number of frames to extract from the video to cut running time on the script (if the video is too long). Setting it to 0 means all frames are extracted from the video automatically.
+
+The ```--skin=True``` argument optionally uses a skin detector to extract only skin pixels from the image. It can be set to False for extracting only face frames with no skin segmentation.
 
 # Place the ground truth data files:
 Once the video processing is done, make sure that the ground truth files for each of the video have the SAME NAME as the video. Put all these files in the folder you specified as ```---images_dir```.
@@ -62,11 +66,3 @@ Tensorboardx allows us to save training run data in PyTorch. To monitor the loss
 tensorboard --logdir=<path to tensorboardx log dir>
 ```
 Then open up your browser and navigate to "localhost:6006" to display the visualizations.
-
-# TODOs:
-1. Bug fixes.
-2. ~~Make data pipeline better.~~
-3. ~~Make face detector robust to rotation.~~
-4. ~~Make the predict function run correctly.~~
-5. Maybe changes in the algorithmic logic.
-6. ~~Verify the rPPG input signal as being correct.~~
