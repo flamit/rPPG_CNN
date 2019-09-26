@@ -29,13 +29,13 @@ Your video files should all be inside one folder and there should be nothing els
 
 Run the following command in your terminal: 
 ```bash
-python data_preprocess.py --video_dir=<path to video folder> --images_dir=<path where to save face images> --max_frames=0 --skin=True
+python data_preprocess.py --skin --video_dir=<path to video folder> --images_dir=<path where to save face images> --max_frames=0
 ```
 If the video is rotated, the script automatically checks all rotations that are multiples of 90 for a face, whichever is found to contain a face, is used as the rotation fix for all frames.
 
 The ```max_frames=0``` command can be used to limit the number of frames to extract from the video to cut running time on the script (if the video is too long). Setting it to 0 means all frames are extracted from the video automatically.
 
-The ```--skin=True``` argument optionally uses a skin detector to extract only skin pixels from the image. It can be set to False for extracting only face frames with no skin segmentation.
+The ```--skin``` argument optionally uses a skin detector to extract only skin pixels from the image. Removing this argument will not use face segmentation, but only full face frames.
 
 # Place the ground truth data files:
 Once the video processing is done, make sure that the ground truth files for each of the video have the SAME NAME as the video. Put all these files in the folder you specified as ```---images_dir```.
