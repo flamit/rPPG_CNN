@@ -12,5 +12,5 @@ tensorflow-estimator==1.13.0
 torch==1.1.0
 torchvision==0.3.0
 tqdm==4.31.1
-dlib==19.17.0
+mtcnn==0.0.9
 wget==3.2

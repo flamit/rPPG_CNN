@@ -10,7 +10,7 @@ parser.add_argument("--image_dir", type=str, default='images',
                     help="Directory where face frames extracted from videos are located")
 parser.add_argument("--max_frames", type=int, default=0,
                     help="Max number of frames to extract from a video, set to 0 to extract all frames")
-parser.add_argument("--skin", default=False, action='store_true',
+parser.add_argument("--skin", default=True, action='store_true',
                     help="Whether to use skin segmentation when extracting frames")
 
 
@@ -35,4 +35,4 @@ if __name__ == '__main__':
             print("Downloading skin segmentation model...")
             wget.download('https://github.com/nasir6/face-segmentation/raw/master/linknet.pth',
                           os.path.join(os.getcwd(), 'face', 'model', 'linknet.pth'))
-        extract_and_write_face(video_filename, work_dir, args.max_frames, args.skin)
+        extract_and_write_face(video_filename, work_dir, 256, args.max_frames, args.skin)
